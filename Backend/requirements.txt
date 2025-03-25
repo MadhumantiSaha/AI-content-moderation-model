@@ -1,0 +1,7 @@
+google-cloud-language
+fastapi[standard]
+google-cloud-storage
+google.cloud.videointelligence
+starlette-cors
+google.cloud.vision
+dotenv
