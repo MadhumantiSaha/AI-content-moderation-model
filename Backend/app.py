@@ -1,9 +1,23 @@
+'''
+Author: TEAM UNIQUE
+
+Members: Snehel Basu
+         Sounak Banerjee
+        
+'''
+#import the neccessary packages and modules
+
 import os
 import uuid
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from cloud_operations import upload_blob, analyze_image, analyze_video, analyze_texts
+#For database
+from Database_essentials import db_Configure , db_Calculations
+
+# main code
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -25,7 +39,8 @@ async def create_post(
     username: str = Form(...),
     caption: str = Form(...),
     image: UploadFile = File(None),
-    video: UploadFile = File(None)
+    video: UploadFile = File(None),
+    hashtags: List[str] = data["hashtags"]
 ):
     try:
         if not image and not video:
@@ -47,23 +62,62 @@ async def create_post(
             # Perform image analysis
             img_score = analyze_image(file_link)
             print('\n\n',img_score)
+            
             if img_score['adult']>3 or img_score['violence']>3:
+                
+                # input data into the database (username, caption , file_link, reason, status)
+                db_Configure.insert_data(username, file_link, caption, hashtags, status ="Rejected", reason ="Violates policy")
+                
                 return JSONResponse(content={"error": "Image contains explicit content"}, status_code=400)
+                
         elif video:
             # Perform video analysis
             vid_score = analyze_video(file_link)
+            
             if vid_score>50:
+                
+                # input data into the database (username, hashtag, status, caption , file_link, reason)
+                db_Configure.insert_data(username, file_link, caption, hashtags, status ="Rejected", reason ="Violates policy")    
+                            
                 return JSONResponse(content={"error": "Video contains explicit content"}, status_code=400)
         
         caption = caption if caption else ""
         text_score = analyze_texts(caption)
+        
         if text_score['toxicity_level']=="High":
+            
+            # input into database (username, caption , file_link, reason, status)
+            db_Configure.insert_data(username, file_link, caption, hashtags, status ="Rejected", reason ="Violates policy")            
+           
             return JSONResponse(content={"error": "Caption contains explicit content"}, status_code=400)
-
-
+            
+        #input into the database (username, fiile_link, caption, hashtags, status:approved , reason:safe)
+        db_Configure.insert_data(username, file_link, caption, hashtags, status ="Approved", reason = "Safe")
+       
         return JSONResponse(content={"message": "Post created successfully"}, status_code=201)
 
     except HTTPException as http_exception:
         return JSONResponse(content={"error": http_exception.detail}, status_code=http_exception.status_code)
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
+    
+    
+#For Frontend
+   
+@app.get('/dashboard')
+def dashboard_data():
+    # Retrieve data from database (total content reviwed, no. of unapproved status, approval rate, frequancy of hashtags )
+    #content_reviewed = db_Calculations.get_total_entries()
+    unapproved_status = db_Calculations.get_unapproved_count()
+    approval_rate = db_Calculations.get_approval_rate()
+    # return as Tuples [needs Tuple unpacking before using]
+    return ( unapproved_status, approval_rate )
+    
+
+
+@app.get('/content_review') 
+def content_review():
+    # Retrieve data from database (username, caption, file_link, reason, status if unapproved)
+    content_reviewed = db_Calculations.get_total_entries()
+    return content_reviewed
+

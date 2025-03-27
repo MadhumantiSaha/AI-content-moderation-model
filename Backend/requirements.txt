@@ -5,3 +5,4 @@ google.cloud.videointelligence
 starlette-cors
 google.cloud.vision
 dotenv
+mysql-connector-python

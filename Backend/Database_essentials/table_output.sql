@@ -1,0 +1,1 @@
+DESCRIBE social_media_posts;

@@ -1,0 +1,1 @@
+CREATE DATABASE social_media_db;
