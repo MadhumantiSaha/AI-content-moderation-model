@@ -10,12 +10,12 @@ load_dotenv()
 '''Initializations'''
 
 likelihood_name = {
-        "UNKNOWN": 0, #0
-        "VERY_UNLIKELY": 1, #1
-        "UNLIKELY": 2,#2
-        "POSSIBLE": 3,#3
-        "LIKELY": 4,#4
-        "VERY_LIKELY": 5,#5
+         0:"UNKNOWN" ,#0
+         1:"VERY_UNLIKELY" ,#1
+         2:"UNLIKELY",#2
+         3:"POSSIBLE",#3
+         4:"LIKELY",#4
+         5:"VERY_LIKELY",#5
     }
 
 bucket_name = os.environ.get("GCS_BUCKET_NAME")
@@ -77,14 +77,17 @@ def analyze_image(link_to_image):
 
     response = image_client.safe_search_detection(image=image)
     safe = response.safe_search_annotation
-   
+    print((safe))
     if response.error.message:
         raise Exception(
             "{}\nFor more info on error messages, check: "
             "https://cloud.google.com/apis/design/errors".format(response.error.message)
         )
-    return {"adult":likelihood_name[str(safe.adult).split('.')[1]],
-            "violence":likelihood_name[str(safe.violence).split('.')[1]]
+    print(safe.adult)
+    print(safe.violence)
+    # print(likelihood_name[str(safe.violence).split(':')[1]])
+    return {"adult":int(safe.adult),
+            "violence":int(safe.violence)
             }
 
 
@@ -110,8 +113,6 @@ def analyze_texts(text):
         "toxicity_level": toxicity_level,
     }
 
-vid_score = analyze_video('gs://filedumpbucket/4381dfae-0a9c-4f50-8622-65eefe2392b0.mp4')
-print(vid_score)
 
 # print(img_score.adult)
 # print(img_score.violence)
