@@ -175,6 +175,7 @@ def retrieve_data():
 
 
 '''
+#retrieve data for one user from database
 def retrieve_data_for_user(username):
     connection = create_connection()
     if connection:
@@ -189,7 +190,7 @@ def retrieve_data_for_user(username):
             records = cursor.fetchall()
 
             if not records:
-                return f"No records found for user: {username}"
+                return (f"No records found for user: {username}")
 
             result = []
             for row in records:
@@ -211,7 +212,6 @@ def retrieve_data_for_user(username):
             cursor.close()
             connection.close()
 '''
-
 
 #Function to calculate Frequancy of hashtags and return most used and least used hashtags as dictionary
 def analyze_hashtag_frequency():

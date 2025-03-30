@@ -124,6 +124,7 @@ def content_review():
     # Retrieve data frhttps://cloud.google.com/video-intelligence/docs/feature-explicit-contentom database (username, caption, file_link, reason, status if unapproved)
     #content_reviewed = db_Calculations.get_total_entries()
     '''username | type(image or video) | caption | Date & time | file link | approved/unapproved'''
+    #this function returns result as dictionary 
     retrieved_data = retrieve_data()
     # return JSONResponse(username: username, type: type, caption: caption, date_and_time: date_and_time, file_link: file_link, status: status)
 
