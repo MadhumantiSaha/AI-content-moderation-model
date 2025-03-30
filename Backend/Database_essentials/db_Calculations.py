@@ -233,12 +233,11 @@ def analyze_hashtag_frequency():
             
             most_used = hashtag_counts.most_common(1)[0]
             least_used = min(hashtag_counts.items(), key=lambda x: x[1])
-
-            return {
-                "most_used": {"hashtag": most_used[0], "count": most_used[1]},
-                "least_used": {"hashtag": least_used[0], "count": least_used[1]}
-            }
-
+            frequency = {"most_used": {"hashtag": most_used[0], "count": most_used[1]},
+                "least_used": {"hashtag": least_used[0], "count": least_used[1]}}
+            
+            return frequency
+                
         except mysql.connector.Error as e:
             print(f"Error: {e}")
             return {"most_used": None, "least_used": None}
