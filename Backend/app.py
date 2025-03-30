@@ -126,5 +126,5 @@ def content_review():
     '''username | type(image or video) | caption | Date & time | file link | approved/unapproved'''
     #this function returns result as dictionary 
     retrieved_data = retrieve_data()
-    # return JSONResponse(username: username, type: type, caption: caption, date_and_time: date_and_time, file_link: file_link, status: status)
-
+    #return JSONResponse(username: username, type: type, caption: caption, date_and_time: date_and_time, file_link: file_link, status: status)
+    return JSONResponse(content = {"retrived_data": retrievd_data})
