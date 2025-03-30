@@ -4,12 +4,7 @@ email: sendtosounakbaanerjee@gmail.com
 
 '''
 #import necessary packages
-
-'''
-Author : Sounak Banerjee (TEAM UNIQUE)
-email : sendtosounakbanerjee@gmail.com
-
-'''
+from collections import Counter
 import mysql.connector
 
 #Function to Connect to the database
@@ -48,37 +43,6 @@ def insert_data(user_name,file_link,caption, hashtags,status,reason ):
         finally:
             cursor.close()
             connection.close()
-
-
-
-#Function to retriev data from database
-
-def fetch_data():
-    connection = create_connection()
-    if connection:
-        try:
-            cursor = connection.cursor()
-            cursor.execute("SELECT * FROM social_media_posts")
-            records = cursor.fetchall()
-            '''
-            for row in records:
-                print("User ID:", row[0])
-                print("User Name:", row[1])
-                print("File Link:", row[2])
-                print("Date and Time:", row[3])
-                print("Caption:", row[4])
-                print("Hashtags:", row[5])
-                print("Status:", row[6])
-                print("Reason:", row[7])
-                print("--------------------------")
-            '''
-            return records
-        except mysql.connector.Error as e:
-            print(f"Error: {e}")
-        finally:
-            cursor.close()
-            connection.close()
-
 
 
 #Function for deleting data from database table
@@ -159,7 +123,126 @@ def calculate_approval_rate():
 
 
 
+#Code to Get file type 
+def get_file_type(file_link):
+    if not file_link:
+        return "Unknown"
+    
+    image_extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp']
+    video_extensions = ['mp4', 'mov', 'avi', 'mkv', 'flv']
 
-#Function to calculate Frequancy of hashtags
-def get_hashtag_frequency():
-    pass
+    extension = file_link.split('.')[-1].lower()
+    if extension in image_extensions:
+        return "Image"
+    elif extension in video_extensions:
+        return "Video"
+    else:
+        return "Unknown"
+
+
+#code to fetch all data from database
+def retrieve_data():
+    connection = create_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("""
+                SELECT user_name, file_link, date_and_time, caption, hashtags, status
+                FROM social_media_posts
+            """)
+            
+            records = cursor.fetchall()
+
+            result = []
+            for row in records:
+                file_type = get_file_type(row[1])
+                result.append({
+                    "username": row[0],
+                    "file_link": row[1],
+                    "file_type": file_type,
+                    "date_and_time": row[2],
+                    "caption": row[3],
+                    "hashtags": row[4],
+                    "status": row[5]
+                })
+            return result
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+            return []
+        finally:
+            cursor.close()
+            connection.close()
+
+
+'''
+def retrieve_data_for_user(username):
+    connection = create_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            query = """
+                SELECT user_name, file_link, date_and_time, caption, hashtags, status
+                FROM social_media_posts
+                WHERE user_name = %s
+            """
+            cursor.execute(query, (username,))
+            records = cursor.fetchall()
+
+            if not records:
+                return f"No records found for user: {username}"
+
+            result = []
+            for row in records:
+                file_type = get_file_type(row[1])
+                result.append({
+                    "username": row[0],
+                    "file_link": row[1],
+                    "file_type": file_type,
+                    "date_and_time": row[2],
+                    "caption": row[3],
+                    "hashtags": row[4],
+                    "status": row[5]
+                })
+            return result
+
+        except mysql.connector.Error as e:
+            return f"Error: {e}"
+        finally:
+            cursor.close()
+            connection.close()
+'''
+
+
+#Function to calculate Frequancy of hashtags and return most used and least used hashtags as dictionary
+def analyze_hashtag_frequency():
+    connection = create_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("SELECT hashtags FROM social_media_posts")
+            hashtags_list = []
+
+            for row in cursor.fetchall():
+                if row[0]:
+                    hashtags_list.extend(row[0].split())
+
+            if not hashtags_list:
+                return {"most_used": None, "least_used": None}
+            
+            hashtag_counts = Counter(hashtags_list)
+            
+            most_used = hashtag_counts.most_common(1)[0]
+            least_used = min(hashtag_counts.items(), key=lambda x: x[1])
+
+            return {
+                "most_used": {"hashtag": most_used[0], "count": most_used[1]},
+                "least_used": {"hashtag": least_used[0], "count": least_used[1]}
+            }
+
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+            return {"most_used": None, "least_used": None}
+        finally:
+            cursor.close()
+            connection.close()
+

@@ -113,16 +113,17 @@ def dashboard_data():
     content_reviewed = db_Calculations.get_total_entries()
     unapproved_count = db_Calculations.get_unapproved_count()
     approval_rate = db_Calculations.calculate_approval_rate()
-    # return as Tuples [needs Tuple unpacking before using]
-    return JSONResponse(content={"content_reviewed": content_reviewed, "unapproved_status": unapproved_count, "approval_rate": approval_rate})
+    hashtag_frequency = analyze_hashtag_frequency()
+
+    return JSONResponse(content={"content_reviewed": content_reviewed, "unapproved_status": unapproved_count, "approval_rate": approval_rate, "hashtag_frequency": hashtag_frequency})
     
 
 
 @app.get('/content_review') 
 def content_review():
     # Retrieve data frhttps://cloud.google.com/video-intelligence/docs/feature-explicit-contentom database (username, caption, file_link, reason, status if unapproved)
-    content_reviewed = db_Calculations.get_total_entries()
+    #content_reviewed = db_Calculations.get_total_entries()
     '''username | type(image or video) | caption | Date & time | file link | approved/unapproved'''
-    
+    retrieved_data = retrieve_data()
     # return JSONResponse(username: username, type: type, caption: caption, date_and_time: date_and_time, file_link: file_link, status: status)
 
