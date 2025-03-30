@@ -17,7 +17,7 @@ def create_connection():
             database="social_media_db"
         )
         if connection.is_connected():
-            print("Connected to the database!")
+            #print("Connected to the database!")
             return connection
     except mysql.connector.Error as e:
         print(f"Error: {e}")
