@@ -159,7 +159,6 @@ def retrieve_data():
                 file_type = get_file_type(row[1])
                 result.append({
                     "username": row[0],
-                    
                     "file_type": file_type,
                     "date_and_time": str(row[1]),
                     "caption": row[2],
@@ -230,6 +229,7 @@ def analyze_hashtag_frequency():
                 if row[0]:
                     hashtags = json.loads(row[0])  # Parse JSON array
                     hashtags_list.extend(hashtags)
+                    
             if not hashtags_list:
                 return {"most_used": []}  # Return empty list if no hashtags
 
