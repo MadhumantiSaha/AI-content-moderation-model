@@ -1,12 +1,4 @@
-'''
-Author: TEAM UNIQUE
-
-Members: Snehel Basu
-         Sounak Banerjee
-        
-'''
 #import the neccessary packages and modules
-
 import os
 import uuid
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
@@ -114,12 +106,17 @@ def dashboard_data():
         unapproved_count = db_Calculations.get_unapproved_count()
         approval_rate = db_Calculations.calculate_approval_rate()
         hashtag_frequency = db_Calculations.analyze_hashtag_frequency()
+        media_count = db_Calculations.media_count()
+        image_count = media_count["image_count"]
+        video_count = media_count["video_count"]
         
         return JSONResponse(content={
             "content_reviewed": content_reviewed,
             "unapproved_status": unapproved_count,
-            "approval_rate": approval_rate,
-            "hashtag_frequency": hashtag_frequency
+            "approval_rate": round(approval_rate),
+            "hashtag_frequency": hashtag_frequency,
+            "image_count": image_count,
+            "video_count": video_count
         })
     except Exception as e:
         print("Error in dashboard_data:", str(e))

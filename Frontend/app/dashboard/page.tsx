@@ -22,35 +22,45 @@ import {
 //DATABASE CALL
 
 // Sample data for charts
-const contentReviewData = [
-  { name: "Mon", images: 65, videos: 45, comments: 120 },
-  { name: "Tue", images: 59, videos: 40, comments: 110 },
-  { name: "Wed", images: 80, videos: 55, comments: 130 },
-  { name: "Thu", images: 81, videos: 56, comments: 135 },
-  { name: "Fri", images: 56, videos: 40, comments: 90 },
-  { name: "Sat", images: 55, videos: 35, comments: 85 },
-  { name: "Sun", images: 40, videos: 30, comments: 70 },
-]
+interface HashtagFrequencyItem {
+  hashtag: string;
+  count: number;
+}
 
-const contentTypeData = [
-  { name: "Images", value: 45 },
-  { name: "Videos", value: 25 },
-  { name: "Comments", value: 30 },
-]
+interface HashtagFrequency {
+  most_used: HashtagFrequencyItem[];
+}
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28"]
+interface Data {
+  content_reviewed: number;
+  unapproved_status: number;
+  approval_rate: number;
+  hashtag_frequency: HashtagFrequency;
+  image_count: number;
+  video_count: number;
+}
 
 export default function DashboardPage() {
-  const { data, loading, error } = useDashboardData()
+  const { data, loading, error } = useDashboardData(); // Explicit type here
 
-  // Convert hashtag frequency to chart data format
-  const hashtagChartData = data?.hashtag_frequency 
-    ? Object.entries(data.hashtag_frequency).map(([name, value]) => ({
-        name,
-        value
+  const hashtagBarChartData = Array.isArray(data?.hashtag_frequency?.most_used)
+    ? data.hashtag_frequency.most_used.map((item) => ({
+        name: item.hashtag,
+        value: item.count,
       }))
-    : []
+    : [];
 
+    const PieChartData = [
+      { name: "Image", value: data?.image_count },
+      { name: "Video", value: data?.video_count },
+    ];
+
+    console.log("PieChartData", PieChartData? "no_data": PieChartData)
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#808080"];
+  const RADIAN = Math.PI / 180;
+
+
+  
   const chartConfig = {
     images: {
       label: "Images",
@@ -59,10 +69,6 @@ export default function DashboardPage() {
     videos: {
       label: "Videos",
       color: "hsl(var(--chart-2))",
-    },
-    comments: {
-      label: "Comments",
-      color: "hsl(var(--chart-3))",
     },
   }
 
@@ -132,14 +138,31 @@ export default function DashboardPage() {
             <CardContent className="p-0 overflow-hidden">
               <ChartContainer className="h-[300px] w-full" config={chartConfig}>
                 <ResponsiveContainer width="99%" height={280}>
-                  <RechartsBarChart data={hashtagChartData}>
+                  <RechartsBarChart data={hashtagBarChartData}>
+                    
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
                     <Bar dataKey="value" fill="#0088FE" name="Frequency" />
                   </RechartsBarChart>
-                </ResponsiveContainer>
+                  </ResponsiveContainer>               
+              </ChartContainer>
+              <ChartContainer className="h-[300px] w-full" config={chartConfig}>
+              <ResponsiveContainer width="100%" height="100%">
+        <RechartsPieChart width={400} height={400}>
+          <Pie
+            dataKey="value"
+            isAnimationActive={false}
+            data={PieChartData}
+            cx="50%"
+            cy="50%"
+            outerRadius={80}
+            fill="#8884d8"
+            label
+          />
+          </RechartsPieChart>
+      </ResponsiveContainer>
               </ChartContainer>
             </CardContent>
           </Card>
