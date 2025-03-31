@@ -113,7 +113,7 @@ def dashboard_data():
     content_reviewed = db_Calculations.get_total_entries()
     unapproved_count = db_Calculations.get_unapproved_count()
     approval_rate = db_Calculations.calculate_approval_rate()
-    hashtag_frequency = analyze_hashtag_frequency()
+    hashtag_frequency = db_Calculations.analyze_hashtag_frequency()
 
     return JSONResponse(content={"content_reviewed": content_reviewed, "unapproved_status": unapproved_count, "approval_rate": approval_rate, "hashtag_frequency": hashtag_frequency})
     
@@ -125,6 +125,6 @@ def content_review():
     #content_reviewed = db_Calculations.get_total_entries()
     '''username | type(image or video) | caption | Date & time | file link | approved/unapproved'''
     #this function returns result as dictionary 
-    retrieved_data = retrieve_data()
+    retrieved_data = db_Calculations.retrieve_data()
     #return JSONResponse(username: username, type: type, caption: caption, date_and_time: date_and_time, file_link: file_link, status: status)
-    return JSONResponse(content = {"retrived_data": retrievd_data})
+    return JSONResponse(content = {"retrived_data": retrieved_data})

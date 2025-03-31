@@ -6,6 +6,8 @@ email: sendtosounakbaanerjee@gmail.com
 #import necessary packages
 from collections import Counter
 import mysql.connector
+from collections import Counter
+import json
 
 #Function to Connect to the database
 def create_connection():
@@ -147,7 +149,7 @@ def retrieve_data():
         try:
             cursor = connection.cursor()
             cursor.execute("""
-                SELECT user_name, file_link, date_and_time, caption, hashtags, status
+                SELECT user_name, date_and_time, caption, hashtags, status
                 FROM social_media_posts
             """)
             
@@ -158,12 +160,12 @@ def retrieve_data():
                 file_type = get_file_type(row[1])
                 result.append({
                     "username": row[0],
-                    "file_link": row[1],
+                    
                     "file_type": file_type,
-                    "date_and_time": row[2],
-                    "caption": row[3],
-                    "hashtags": row[4],
-                    "status": row[5]
+                    "date_and_time": str(row[1]),
+                    "caption": row[2],
+                    "hashtags": row[3],
+                    "status": row[4]
                 })
             return result
         except mysql.connector.Error as e:
@@ -214,7 +216,6 @@ def retrieve_data_for_user(username):
 '''
 
 #Function to calculate Frequancy of hashtags and return most used and least used hashtags as dictionary
-from collections import Counter
 
 def analyze_hashtag_frequency():
     connection = create_connection()
@@ -223,29 +224,27 @@ def analyze_hashtag_frequency():
             cursor = connection.cursor()
             cursor.execute("SELECT hashtags FROM social_media_posts")
             hashtags_list = []
+            
 
             for row in cursor.fetchall():
                 if row[0]:
-                    hashtags_list.extend(row[0].split())
-
+                    hashtags = json.loads(row[0])  # Parse JSON array
+                    hashtags_list.extend(hashtags)
             if not hashtags_list:
-                return {"most_used": None, "least_used": None}
-            
+                return {"most_used": []}  # Return empty list if no hashtags
+
             hashtag_counts = Counter(hashtags_list)
-            
             most_used = hashtag_counts.most_common(5)
-            #least_used = min(hashtag_counts.items(), key=lambda x: x[1])
 
             frequency = {
                 "most_used": [{"hashtag": tag, "count": count} for tag, count in most_used],
-                #"least_used": {"hashtag": least_used[0], "count": least_used[1]}
             }
-            
-            return frequency
 
-        except mysql.connector.Error as e:
-            print(f"Error: {e}")
-            return {"most_used": None, "least_used": None}
+            return frequency
+        except (json.JSONDecodeError, TypeError):
+                    print(f"Warning: Invalid JSON or data in row: {row}")
+
+        
         finally:
             cursor.close()
             connection.close()
