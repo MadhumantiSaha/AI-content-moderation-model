@@ -3,6 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Activity, AlertTriangle, CheckCircle } from "lucide-react"
 import DashboardLayout from "@/components/dashboard-layout"
 import { ChartContainer } from "@/components/ui/chart"
+import { useDashboardData } from "@/hooks/useDashboardData"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Bar,
   BarChart as RechartsBarChart,
@@ -14,6 +16,7 @@ import {
   Tooltip,
   XAxis,
   YAxis,
+  Cell
 } from "recharts"
 
 //DATABASE CALL
@@ -38,6 +41,16 @@ const contentTypeData = [
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28"]
 
 export default function DashboardPage() {
+  const { data, loading, error } = useDashboardData()
+
+  // Convert hashtag frequency to chart data format
+  const hashtagChartData = data?.hashtag_frequency 
+    ? Object.entries(data.hashtag_frequency).map(([name, value]) => ({
+        name,
+        value
+      }))
+    : []
+
   const chartConfig = {
     images: {
       label: "Images",
@@ -68,8 +81,13 @@ export default function DashboardPage() {
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">2,345</div>
-              <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+              {loading ? (
+                <Skeleton className="h-8 w-24" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{data?.content_reviewed || 0}</div>
+                </>
+              )}
             </CardContent>
           </Card>
           <Card>
@@ -78,8 +96,13 @@ export default function DashboardPage() {
               <AlertTriangle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">345</div>
-              <p className="text-xs text-muted-foreground">+12.5% from last month</p>
+              {loading ? (
+                <Skeleton className="h-8 w-24" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{data?.unapproved_status || 0}</div>
+                </>
+              )}
             </CardContent>
           </Card>
           <Card>
@@ -88,60 +111,34 @@ export default function DashboardPage() {
               <CheckCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">78.2%</div>
-              <p className="text-xs text-muted-foreground">+4.3% from last month</p>
+              {loading ? (
+                <Skeleton className="h-8 w-24" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{data?.approval_rate || 0}%</div>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+          {/* Replace the content distribution chart with hashtag frequency */}
           <Card className="col-span-4">
             <CardHeader>
-              <CardTitle>Content Review Overview</CardTitle>
-              <CardDescription>Number of content items reviewed by type</CardDescription>
+              <CardTitle>Hashtag Distribution</CardTitle>
+              <CardDescription>Frequency of hashtags in content</CardDescription>
             </CardHeader>
             <CardContent className="p-0 overflow-hidden">
-              <ChartContainer config={chartConfig} className="h-[300px] w-full">
+              <ChartContainer className="h-[300px] w-full" config={chartConfig}>
                 <ResponsiveContainer width="99%" height={280}>
-                  <RechartsBarChart data={contentReviewData}>
+                  <RechartsBarChart data={hashtagChartData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
-                    <Legend />
-                    <Bar dataKey="images" fill="#0088FE" name="Images" />
-                    <Bar dataKey="videos" fill="#00C49F" name="Videos" />
-                    <Bar dataKey="comments" fill="#FFBB28" name="Comments" />
+                    <Bar dataKey="value" fill="#0088FE" name="Frequency" />
                   </RechartsBarChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-          <Card className="col-span-3">
-            <CardHeader>
-              <CardTitle>Content Distribution</CardTitle>
-              <CardDescription>Distribution of content by type</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig} className="h-[300px] w-full">
-                <ResponsiveContainer width="99%" height={280}>
-                  <RechartsPieChart>
-                    <Pie
-                      data={contentTypeData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    >
-                      {contentTypeData.map((entry, index) => (
-                        <Pie key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </RechartsPieChart>
                 </ResponsiveContainer>
               </ChartContainer>
             </CardContent>

@@ -1,5 +1,6 @@
 "use client"
 
+// import DashboardLayout from "@/components/dashboard-layout"
 import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -838,7 +839,7 @@ export default function ModerationHistoryPage() {
                         <Calendar
                           mode="range"
                           selected={dateRange}
-                          onSelect={setDateRange}
+                          onSelect={(range) => setDateRange(range ? { from: range.from, to: range.to ?? undefined } : { from: undefined, to: undefined })}
                           numberOfMonths={2}
                           initialFocus
                         />
@@ -895,7 +896,7 @@ export default function ModerationHistoryPage() {
                   <TabsTrigger value="grid">Grid</TabsTrigger>
                 </TabsList>
               </Tabs>
-            </Tabs>
+            </div>
           </CardHeader>
           <CardContent>
             {error ? (
@@ -962,11 +963,10 @@ export default function ModerationHistoryPage() {
                           <TableHead>Title</TableHead>
                           <TableHead className="cursor-pointer" onClick={() => handleSort("username")}>
                             <div className="flex items-center">
-                              User
+                              Username
                               {renderSortIndicator("username")}
                             </div>
                           </TableHead>
-                          <TableHead>User ID</TableHead>
                           <TableHead>Hashtags</TableHead>
                           <TableHead className="cursor-pointer" onClick={() => handleSort("timestamp")}>
                             <div className="flex items-center">
@@ -974,7 +974,6 @@ export default function ModerationHistoryPage() {
                               {renderSortIndicator("timestamp")}
                             </div>
                           </TableHead>
-                          <TableHead>Status</TableHead>
                           <TableHead className="cursor-pointer" onClick={() => handleSort("action")}>
                             <div className="flex items-center">
                               Action
@@ -982,28 +981,21 @@ export default function ModerationHistoryPage() {
                             </div>
                           </TableHead>
                           <TableHead>Caption</TableHead>
-                          <TableHead>Media</TableHead>
                           <TableHead>Reason</TableHead>
-                          <TableHead className="cursor-pointer" onClick={() => handleSort("reportCount")}>
-                            <div className="flex items-center">
-                              Reports
-                              {renderSortIndicator("reportCount")}
-                            </div>
-                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {isLoading ? (
                           Array.from({ length: 5 }).map((_, index) => (
                             <TableRow key={index}>
-                              <TableCell colSpan={13}>
+                              <TableCell colSpan={10}>
                                 <Skeleton className="h-8 w-full" />
                               </TableCell>
                             </TableRow>
                           ))
                         ) : paginatedHistory.length === 0 ? (
                           <TableRow>
-                            <TableCell colSpan={13} className="text-center h-24 text-muted-foreground">
+                            <TableCell colSpan={10} className="text-center h-24 text-muted-foreground">
                               No moderation history found matching your filters
                             </TableCell>
                           </TableRow>
@@ -1029,19 +1021,6 @@ export default function ModerationHistoryPage() {
                               <TableCell>{item.title}</TableCell>
                               <TableCell>{item.username}</TableCell>
                               <TableCell>
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <span className="cursor-help underline decoration-dotted">{item.userId}</span>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>User ID: {item.userId}</p>
-                                      <p>Platform: {item.platform || "Unknown"}</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              </TableCell>
-                              <TableCell>
                                 <div className="flex flex-wrap gap-1 max-w-[150px]">
                                   {item.hashtags.length > 0 ? (
                                     item.hashtags.map((tag, idx) => (
@@ -1054,53 +1033,12 @@ export default function ModerationHistoryPage() {
                                   )}
                                 </div>
                               </TableCell>
-                              <TableCell>
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <span className="cursor-help underline decoration-dotted">
-                                        {new Date(item.timestamp).toLocaleString()}
-                                      </span>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Moderated by: {item.moderator}</p>
-                                      <p>Moderator ID: {item.moderatorId}</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              </TableCell>
-                              <TableCell>{renderStatusBadge(item.status)}</TableCell>
+                              <TableCell>{new Date(item.timestamp).toLocaleString()}</TableCell>
                               <TableCell>{renderActionBadge(item.action)}</TableCell>
                               <TableCell className="max-w-[200px] truncate" title={item.caption}>
                                 {item.caption || <span className="text-muted-foreground text-xs">No caption</span>}
                               </TableCell>
-                              <TableCell>
-                                {item.mediaUrl ? (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-7 px-2"
-                                    onClick={() => openMediaDialog(item)}
-                                  >
-                                    <Eye className="h-3 w-3 mr-1" />
-                                    View
-                                  </Button>
-                                ) : (
-                                  <span className="text-muted-foreground text-xs">N/A</span>
-                                )}
-                              </TableCell>
-                              <TableCell className="max-w-xs truncate" title={item.reason}>
-                                {item.reason}
-                              </TableCell>
-                              <TableCell>
-                                {item.reportCount !== undefined && item.reportCount > 0 ? (
-                                  <Badge variant={item.reportCount > 3 ? "destructive" : "outline"}>
-                                    {item.reportCount}
-                                  </Badge>
-                                ) : (
-                                  <span className="text-muted-foreground text-xs">0</span>
-                                )}
-                              </TableCell>
+                              <TableCell>{item.reason}</TableCell>
                             </TableRow>
                           ))
                         )}
