@@ -148,7 +148,7 @@ def retrieve_data():
         try:
             cursor = connection.cursor()
             cursor.execute("""
-                SELECT user_name, date_and_time, caption, hashtags, status
+                SELECT user_name, date_and_time, caption, hashtags, status, file_link, reason
                 FROM social_media_posts
             """)
             
@@ -156,14 +156,15 @@ def retrieve_data():
 
             result = []
             for row in records:
-                file_type = get_file_type(row[1])
+                file_type = get_file_type(row[5])
                 result.append({
                     "username": row[0],
                     "file_type": file_type,
                     "date_and_time": str(row[1]),
                     "caption": row[2],
                     "hashtags": row[3],
-                    "status": row[4]
+                    "status": row[4],
+                    "reason": row[6]
                 })
             return result
         except mysql.connector.Error as e:
