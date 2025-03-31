@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 BE
 temp_uploads
+myenv
+__pycache__/
+*.pyc
