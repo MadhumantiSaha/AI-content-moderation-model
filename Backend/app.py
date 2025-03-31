@@ -86,7 +86,7 @@ async def create_post(
         caption = caption if caption else ""
         text_score = analyze_texts(caption)
         
-        if text_score['toxicity_level']=="High":
+        if text_score['toxicity_level']=="High" or text_score['toxicity_level']=="Moderate":
             
             # input into database (username, caption , file_link, reason, status)
             db_Calculations.insert_data(username, file_link, caption, hashtags, status ="Rejected", reason ="Violates policy")            
