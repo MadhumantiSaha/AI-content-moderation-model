@@ -214,6 +214,8 @@ def retrieve_data_for_user(username):
 '''
 
 #Function to calculate Frequancy of hashtags and return most used and least used hashtags as dictionary
+from collections import Counter
+
 def analyze_hashtag_frequency():
     connection = create_connection()
     if connection:
@@ -231,13 +233,16 @@ def analyze_hashtag_frequency():
             
             hashtag_counts = Counter(hashtags_list)
             
-            most_used = hashtag_counts.most_common(1)[0]
-            least_used = min(hashtag_counts.items(), key=lambda x: x[1])
-            frequency = {"most_used": {"hashtag": most_used[0], "count": most_used[1]},
-                "least_used": {"hashtag": least_used[0], "count": least_used[1]}}
+            most_used = hashtag_counts.most_common(5)
+            #least_used = min(hashtag_counts.items(), key=lambda x: x[1])
+
+            frequency = {
+                "most_used": [{"hashtag": tag, "count": count} for tag, count in most_used],
+                #"least_used": {"hashtag": least_used[0], "count": least_used[1]}
+            }
             
             return frequency
-                
+
         except mysql.connector.Error as e:
             print(f"Error: {e}")
             return {"most_used": None, "least_used": None}
