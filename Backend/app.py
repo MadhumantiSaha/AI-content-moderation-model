@@ -22,10 +22,10 @@ from Database_essentials import db_Calculations
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # Allows requests from localhost:8080
+    allow_origins=["http://localhost:3000", "http://localhost:3001"],  # Update to match your frontend port
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all HTTP methods
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.get('/')
@@ -109,15 +109,24 @@ async def create_post(
    
 @app.get('/dashboard')
 def dashboard_data():
-    # Retrieve data from database (total content reviwed, no. of unapproved status, approval rate, frequancy of hashtags )
-    content_reviewed = db_Calculations.get_total_entries()
-    unapproved_count = db_Calculations.get_unapproved_count()
-    approval_rate = db_Calculations.calculate_approval_rate()
-    hashtag_frequency = db_Calculations.analyze_hashtag_frequency()
-
-    return JSONResponse(content={"content_reviewed": content_reviewed, "unapproved_status": unapproved_count, "approval_rate": approval_rate, "hashtag_frequency": hashtag_frequency})
-    
-
+    try:
+        content_reviewed = db_Calculations.get_total_entries()
+        unapproved_count = db_Calculations.get_unapproved_count()
+        approval_rate = db_Calculations.calculate_approval_rate()
+        hashtag_frequency = db_Calculations.analyze_hashtag_frequency()
+        
+        return JSONResponse(content={
+            "content_reviewed": content_reviewed,
+            "unapproved_status": unapproved_count,
+            "approval_rate": approval_rate,
+            "hashtag_frequency": hashtag_frequency
+        })
+    except Exception as e:
+        print("Error in dashboard_data:", str(e))
+        return JSONResponse(
+            content={"error": str(e)}, 
+            status_code=500
+        )
 
 @app.get('/content_review') 
 def content_review():
