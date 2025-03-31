@@ -5,6 +5,8 @@ interface DashboardData {
   unapproved_status: number
   approval_rate: number
   hashtag_frequency: Record<string, number>
+  image_count: number
+  video_count: number
 }
 
 export function useDashboardData() {
@@ -15,7 +17,7 @@ export function useDashboardData() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/dashboard')
+        const response = await fetch('http://localhost:8000/dashboard',{method:'GET'})
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
