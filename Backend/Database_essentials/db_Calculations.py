@@ -214,7 +214,7 @@ def retrieve_data_for_user(username):
 '''
 
 #Function to calculate Frequancy of hashtags and return most used and least used hashtags as dictionary
-from collections import Counter
+#from collections import Counter
 
 def analyze_hashtag_frequency():
     connection = create_connection()
@@ -249,4 +249,8 @@ def analyze_hashtag_frequency():
         finally:
             cursor.close()
             connection.close()
+            
+            
+            
+            
 
