@@ -129,46 +129,54 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          {/* Replace the content distribution chart with hashtag frequency */}
-          <Card className="col-span-4">
-            <CardHeader>
-              <CardTitle>Hashtag Distribution</CardTitle>
-              <CardDescription>Frequency of hashtags in content</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0 overflow-hidden">
-              <ChartContainer className="h-[300px] w-full" config={chartConfig}>
-                <ResponsiveContainer width="99%" height={280}>
-                  <RechartsBarChart data={hashtagBarChartData}>
-                    
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="value" fill="#0088FE" name="Frequency" />
-                  </RechartsBarChart>
-                  </ResponsiveContainer>               
-              </ChartContainer>
-              <ChartContainer className="h-[300px] w-full" config={chartConfig}>
-              <ResponsiveContainer width="100%" height="100%">
-        <RechartsPieChart width={400} height={400}>
-          <Pie
-            dataKey="value"
-            isAnimationActive={false}
-            data={PieChartData}
-            cx="50%"
-            cy="50%"
-            outerRadius={80}
-            fill="#8884d8"
-            label
-          />
-          </RechartsPieChart>
-      </ResponsiveContainer>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </DashboardLayout>
-  )
-}
+  {/* Card for Hashtag Distribution Bar Chart */}
+  <Card className="col-span-4 md:col-span-3">
+    <CardHeader>
+      <CardTitle>Hashtag Distribution</CardTitle>
+      <CardDescription>Frequency of hashtags in content</CardDescription>
+    </CardHeader>
+    <CardContent className="p-0 overflow-hidden">
+      <ChartContainer className="h-[300px] w-full" config={chartConfig}>
+        <ResponsiveContainer width="100%" height="100%">
+          <RechartsBarChart data={hashtagBarChartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="value" fill="#0088FE" name="Frequency" />
+          </RechartsBarChart>
+        </ResponsiveContainer>
+      </ChartContainer>
+    </CardContent>
+  </Card>
 
+  {/* Card for Pie Chart */}
+  <Card className="col-span-4 md:col-span-3">
+    <CardHeader>
+      <CardTitle>Content Type Distribution</CardTitle>
+      <CardDescription>Distribution of content types</CardDescription>
+    </CardHeader>
+    <CardContent className="p-0 overflow-hidden">
+      <ChartContainer className="h-[300px] w-full" config={chartConfig}>
+        <ResponsiveContainer width="100%" height="100%">
+          <RechartsPieChart>
+            <Pie
+              dataKey="value"
+              isAnimationActive={false}
+              data={PieChartData}
+              cx="50%"
+              cy="50%"
+              outerRadius={80}
+              fill="#8884d8"
+              label
+            />
+          </RechartsPieChart>
+        </ResponsiveContainer>
+      </ChartContainer>
+    </CardContent>
+  </Card>
+</div>
+</div>
+</DashboardLayout>
+)
+}
