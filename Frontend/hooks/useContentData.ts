@@ -18,7 +18,7 @@ export function useContentData() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/content_review',{method:'GET'}); 
+        const response = await fetch('http://localhost:8000/moderation-history',{method:'GET'}); 
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`)
