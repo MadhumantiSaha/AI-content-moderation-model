@@ -11,6 +11,7 @@ import {
   CartesianGrid,
   Legend,
   Pie,
+  Sector,
   PieChart as RechartsPieChart,
   ResponsiveContainer,
   Tooltip,
@@ -40,6 +41,40 @@ interface Data {
   video_count: number;
 }
 
+interface CustomizedLabelProps {
+  cx: number;
+  cy: number;
+  midAngle: number;
+  innerRadius: number;
+  outerRadius: number;
+  percent: number;
+  index: number;
+  title: string;
+}
+
+const RADIAN = Math.PI / 180;
+
+const renderCustomizedLabel = ({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  percent,
+  index,
+  title,
+}: CustomizedLabelProps) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
+
 export default function DashboardPage() {
   const { data, loading, error } = useDashboardData(); // Explicit type here
 
@@ -50,13 +85,20 @@ export default function DashboardPage() {
       }))
     : [];
 
-    const PieChartData = [
-      { name: "Image", value: data?.image_count },
-      { name: "Video", value: data?.video_count },
-    ];
+    //interface for piechart data
+    interface PieChartDataItem {
+      name: string;
+      value: number;
+    }
 
-    console.log("PieChartData", PieChartData? "no_data": PieChartData)
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#808080"];
+  // Pie chart data
+  const PieChartData: PieChartDataItem[] = [
+    { name: 'Images', value: data?.image_count || 0 },
+    { name: 'Videos', value: data?.video_count || 0 },
+  ];
+
+    const COLORS = [ '#FF8042', '#00C49F', '#FFBB28','#0088FE'];
+
   const RADIAN = Math.PI / 180;
 
 
@@ -128,9 +170,11 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <div className="flex ">
+          
   {/* Card for Hashtag Distribution Bar Chart */}
-  <Card className="col-span-4 md:col-span-3">
+  
+  <Card className="col-span-4 md:col-span-3 w-[65%]">
     <CardHeader>
       <CardTitle>Hashtag Distribution</CardTitle>
       <CardDescription>Frequency of hashtags in content</CardDescription>
@@ -151,30 +195,36 @@ export default function DashboardPage() {
   </Card>
 
   {/* Card for Pie Chart */}
-  <Card className="col-span-4 md:col-span-3">
+  
+  <Card className="col-span-4 md:col-span-3 w-[35%]">
     <CardHeader>
       <CardTitle>Content Type Distribution</CardTitle>
       <CardDescription>Distribution of content types</CardDescription>
     </CardHeader>
     <CardContent className="p-0 overflow-hidden">
       <ChartContainer className="h-[300px] w-full" config={chartConfig}>
-        <ResponsiveContainer width="100%" height="100%">
-          <RechartsPieChart>
-            <Pie
-              dataKey="value"
-              isAnimationActive={false}
-              data={PieChartData}
-              cx="50%"
-              cy="50%"
-              outerRadius={80}
-              fill="#8884d8"
-              label
-            />
-          </RechartsPieChart>
-        </ResponsiveContainer>
+      <ResponsiveContainer width="100%" height="100%">
+        <RechartsPieChart width={400} height={400}>
+          <Pie
+            data={PieChartData}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            label={renderCustomizedLabel}
+            outerRadius={80}
+            fill="#8884d8"
+            dataKey="value"
+          >
+            {PieChartData?.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+        </RechartsPieChart>
+      </ResponsiveContainer>
       </ChartContainer>
     </CardContent>
   </Card>
+  
 </div>
 </div>
 </DashboardLayout>
