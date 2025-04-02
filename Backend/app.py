@@ -125,12 +125,42 @@ def dashboard_data():
             status_code=500
         )
 
-@app.get('/content_review') 
+@app.get('/moderation-history') 
 def content_review():
     # Retrieve data frhttps://cloud.google.com/video-intelligence/docs/feature-explicit-contentom database (username, caption, file_link, reason, status if unapproved)
-    #content_reviewed = db_Calculations.get_total_entries()
+    content_reviewed = db_Calculations.get_total_entries()
     '''username | type(image or video) | caption | Date & time | file link | approved/unapproved'''
-    #this function returns result as dictionary 
+    # #this function returns result as dictionary 
     retrieved_data = db_Calculations.retrieve_data()
     #return JSONResponse(username: username, type: type, caption: caption, date_and_time: date_and_time, file_link: file_link, status: status)
     return JSONResponse(content = {"retrived_data": retrieved_data})
+    
+    # try:
+    #     retrieved_data = db_Calculations.retrieve_data()
+        
+        # Simplify the data structure
+    #     simplified_data = [{
+    #         "id": item.get("id"),
+    #         "contentId": f"CONTENT-{item.get('id', '000')}",
+    #         "type": "image" if item.get("type") == "image" else "video",
+    #         "title": f"Content {item.get('id', '000')}",
+    #         "username": item.get("username"),
+    #         "caption": item.get("caption"),
+    #         "timestamp": item.get("date_time"),
+    #         "action": "approved" if item.get("status") == "Approved" else "rejected",
+    #         "reason": item.get("reason")
+    #     } for item in retrieved_data]
+        
+    #     return JSONResponse(content={
+    #         "status": "success",
+    #         "data": simplified_data
+    #     })
+    # except Exception as e:
+    #     print("Error in content_review:", str(e))
+    #     return JSONResponse(
+    #         content={
+    #             "status": "error",
+    #             "message": str(e)
+    #         },
+    #         status_code=500
+    #     )

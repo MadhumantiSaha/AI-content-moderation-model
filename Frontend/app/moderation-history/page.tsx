@@ -702,7 +702,7 @@ export default function ModerationHistoryPage() {
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="search"
-                    placeholder="Search by ID, title, username, user ID, hashtags..."
+                    placeholder="Search by ID, title, username..."
                     className="pl-8"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -711,32 +711,23 @@ export default function ModerationHistoryPage() {
 
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
                   <SelectTrigger className="w-full md:w-40">
-                    <div className="flex items-center gap-2">
-                      <Filter className="h-4 w-4" />
-                      <SelectValue placeholder="Content type" />
-                    </div>
+                    <SelectValue placeholder="Content type" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Types</SelectItem>
                     <SelectItem value="image">Images</SelectItem>
                     <SelectItem value="video">Videos</SelectItem>
-                    <SelectItem value="comment">Comments</SelectItem>
                   </SelectContent>
                 </Select>
 
                 <Select value={actionFilter} onValueChange={setActionFilter}>
                   <SelectTrigger className="w-full md:w-40">
-                    <div className="flex items-center gap-2">
-                      <Filter className="h-4 w-4" />
-                      <SelectValue placeholder="Action" />
-                    </div>
+                    <SelectValue placeholder="Action" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Actions</SelectItem>
                     <SelectItem value="approved">Approved</SelectItem>
                     <SelectItem value="rejected">Rejected</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="escalated">Escalated</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -947,56 +938,25 @@ export default function ModerationHistoryPage() {
                           <TableHead className="w-[30px]">
                             <Checkbox
                               checked={selectAll}
-                              onCheckedChange={(checked) => {
-                                setSelectAll(!!checked)
-                              }}
+                              onCheckedChange={(checked) => setSelectAll(!!checked)}
                               aria-label="Select all"
                             />
                           </TableHead>
-                          <TableHead className="cursor-pointer" onClick={() => handleSort("contentId")}>
-                            <div className="flex items-center">
-                              Content ID
-                              {renderSortIndicator("contentId")}
-                            </div>
-                          </TableHead>
                           <TableHead>Type</TableHead>
-                          <TableHead>Title</TableHead>
-                          <TableHead className="cursor-pointer" onClick={() => handleSort("username")}>
-                            <div className="flex items-center">
-                              Username
-                              {renderSortIndicator("username")}
-                            </div>
-                          </TableHead>
-                          <TableHead>Hashtags</TableHead>
-                          <TableHead className="cursor-pointer" onClick={() => handleSort("timestamp")}>
-                            <div className="flex items-center">
-                              Date & Time
-                              {renderSortIndicator("timestamp")}
-                            </div>
-                          </TableHead>
-                          <TableHead className="cursor-pointer" onClick={() => handleSort("action")}>
-                            <div className="flex items-center">
-                              Action
-                              {renderSortIndicator("action")}
-                            </div>
-                          </TableHead>
+                          <TableHead>Username</TableHead>
+                          <TableHead>Date & Time</TableHead>
+                          <TableHead>Action</TableHead>
                           <TableHead>Caption</TableHead>
                           <TableHead>Reason</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {isLoading ? (
-                          Array.from({ length: 5 }).map((_, index) => (
-                            <TableRow key={index}>
-                              <TableCell colSpan={10}>
-                                <Skeleton className="h-8 w-full" />
-                              </TableCell>
-                            </TableRow>
-                          ))
-                        ) : paginatedHistory.length === 0 ? (
                           <TableRow>
-                            <TableCell colSpan={10} className="text-center h-24 text-muted-foreground">
-                              No moderation history found matching your filters
+                            <TableCell colSpan={7}>
+                              <div className="flex justify-center p-4">
+                                <Skeleton className="h-8 w-full" />
+                              </div>
                             </TableCell>
                           </TableRow>
                         ) : (
@@ -1006,37 +966,25 @@ export default function ModerationHistoryPage() {
                                 <Checkbox
                                   checked={selectedItems.includes(item.id)}
                                   onCheckedChange={() => handleCheckboxChange(item.id)}
-                                  aria-label={`Select item ${item.contentId}`}
                                 />
                               </TableCell>
-                              <TableCell className="font-medium">{item.contentId}</TableCell>
                               <TableCell>
                                 <div className="flex items-center gap-1">
-                                  {item.type === "image" && <ImageIcon className="h-3 w-3" />}
-                                  {item.type === "video" && <Video className="h-3 w-3" />}
-                                  {item.type === "comment" && <MessageSquare className="h-3 w-3" />}
+                                  {item.type === "image" ? (
+                                    <ImageIcon className="h-3 w-3" />
+                                  ) : (
+                                    <Video className="h-3 w-3" />
+                                  )}
                                   <span className="capitalize">{item.type}</span>
                                 </div>
                               </TableCell>
-                              <TableCell>{item.title}</TableCell>
                               <TableCell>{item.username}</TableCell>
-                              <TableCell>
-                                <div className="flex flex-wrap gap-1 max-w-[150px]">
-                                  {item.hashtags.length > 0 ? (
-                                    item.hashtags.map((tag, idx) => (
-                                      <Badge key={idx} variant="outline" className="text-xs">
-                                        {tag}
-                                      </Badge>
-                                    ))
-                                  ) : (
-                                    <span className="text-muted-foreground text-xs">None</span>
-                                  )}
-                                </div>
-                              </TableCell>
                               <TableCell>{new Date(item.timestamp).toLocaleString()}</TableCell>
-                              <TableCell>{renderActionBadge(item.action)}</TableCell>
-                              <TableCell className="max-w-[200px] truncate" title={item.caption}>
-                                {item.caption || <span className="text-muted-foreground text-xs">No caption</span>}
+                              <TableCell>
+                                {renderActionBadge(item.action)}
+                              </TableCell>
+                              <TableCell className="max-w-[200px] truncate">
+                                {item.caption || "No caption"}
                               </TableCell>
                               <TableCell>{item.reason}</TableCell>
                             </TableRow>

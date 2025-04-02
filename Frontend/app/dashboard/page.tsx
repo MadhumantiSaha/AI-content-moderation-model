@@ -129,6 +129,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+          
   {/* Card for Hashtag Distribution Bar Chart */}
   <Card className="col-span-4 md:col-span-3">
     <CardHeader>
