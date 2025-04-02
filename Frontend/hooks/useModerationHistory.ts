@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react'
 
 interface ModerationItem {
-  id: number
-  contentId: string
-  type: "image" | "video"
-  title: string
   username: string
+  file_type: string
+  date_and_time: string
   caption: string
-  timestamp: string
-  action: "approved" | "rejected"
-  reason: string
+  hashtags: string[]
+  status: string
 }
 
 export function useModerationHistory() {
@@ -20,17 +17,22 @@ export function useModerationHistory() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/moderation-history')
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
+        const response = await fetch('http://localhost:8000/moderation-history', {
+          method: 'GET',
+      })
+        // if (!response.ok) {
+        //   throw new Error(`HTTP error! status: ${response.status}`)
+        // }
+        console.log(response)
         const result = await response.json()
-        if (result.status === 'success') {
-          setData(result.data) // Data consists of an array of moderation items
+        console.log(result)
+        if (result) {
+          setData(result.data.retrived_data) // Data consists of an array of moderation items
         } else {
           throw new Error(result.message || 'Failed to fetch data')
         }
       } catch (err) {
+        console.log('Error:')
         setError(err instanceof Error ? err.message : 'An error occurred')
       } finally {
         setLoading(false)

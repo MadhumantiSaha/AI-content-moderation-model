@@ -14,11 +14,20 @@ from Database_essentials import db_Calculations
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],  # Update to match your frontend port
+    allow_origins=["http://localhost:3000", "http://localhost:8080"],  # Update to match your frontend port
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+label_dict = {
+    "UNKNOWN": 0,
+    "VERY_UNLIKELY": 1,
+    "UNLIKELY": 2,
+    "POSSIBLE": 3,
+    "LIKELY": 4,
+    "VERY_LIKELY": 5
+}
 
 @app.get('/')
 def index():
@@ -60,20 +69,28 @@ async def create_post(
             if img_score['adult']>3 or img_score['violence']>3:
                 
                 # input data into the database (username, caption , file_link, reason, status)
-                db_Calculations.insert_data(username, file_link, caption, hashtags, status ="Rejected", reason ="Violates policy")
+                db_Calculations.insert_data(username, file_link, caption, hashtags, status ="Rejected", reason =f"Violates policy. Score: {img_score}")
                 
                 return JSONResponse(content={"error": "Image contains explicit content"}, status_code=400)
                 
         elif video:
             # Perform video analysis
             vid_score = analyze_video(file_link)
+            score=0
+            likelihood_name = ''
+            for keys, values in vid_score.items():
+                if values>score:
+                    score=values
+                    likelihood_name = keys
             
-            if vid_score>50:
+            final_score = label_dict[likelihood_name]
+            
+            if final_score>3:
                 
                 # input data into the database (username, hashtag, status, caption , file_link, reason)
-                db_Calculations.insert_data(username, file_link, caption, hashtags, status ="Rejected", reason ="Violates policy")    
+                db_Calculations.insert_data(username, file_link, caption, hashtags, status ="Rejected", reason =f"Violates policy. score:{vid_score}")    
                             
-                return JSONResponse(content={"error": "Video contains explicit content"}, status_code=400)
+                return JSONResponse(content={"error": f"Possibility of explicit content: {likelihood_name}"}, status_code=400)
         
         caption = caption if caption else ""
         text_score = analyze_texts(caption)
