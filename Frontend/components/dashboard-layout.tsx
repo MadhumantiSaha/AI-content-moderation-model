@@ -149,7 +149,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
       </header>
       <div className="flex flex-1">
-        <aside className="hidden md:flex w-64 flex-col border-r bg-muted/40">
+        <aside className="hidden md:flex w-64 flex-col border-r bg-muted/40 fixed h-[calc(100vh-4rem)]">
           <nav className="flex-1 px-4 py-6">
             <ul className="grid gap-1">
               {navigation.map((item) => (
@@ -170,7 +170,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </ul>
           </nav>
         </aside>
-        <main className="flex-1 overflow-auto p-4 md:p-6">
+        <main className="flex-1 overflow-auto p-4 md:p-6 md:ml-64">
           <div className="mx-auto max-w-6xl">{children}</div>
         </main>
       </div>
