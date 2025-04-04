@@ -57,12 +57,12 @@ Supports moderation of:
 
 ### Backend
 - Python
-- Flask
+- FastAPI
 - Google Cloud AI services
   - Vision AI
   - Video Intelligence API
   - Natural Language API
-- SQLite Database
+- MySql Database
 
 ## Getting Started
 
