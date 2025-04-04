@@ -79,7 +79,7 @@ pnpm run dev
 ```sh
 cd Backend
 pip install -r requirements.txt
-python app.py
+Fastapi run app.py
 ```
 
 ### Demo App Setup
@@ -131,20 +131,3 @@ GOOGLE_APPLICATION_CREDENTIALS=path/to/service_account.json
 4. Content either approved or rejected based on policies
 5. Approved content appears on PixelPost feed
 6. Moderators can review decisions in dashboard
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License.
-
-## Documentation
-
-Detailed documentation for the API endpoints, deployment guides, and configuration options can be found in the `/docs` directory.
-
