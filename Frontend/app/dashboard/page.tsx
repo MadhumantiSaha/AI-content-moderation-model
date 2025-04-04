@@ -219,6 +219,14 @@ export default function DashboardPage() {
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
+          <Legend 
+            verticalAlign="bottom"
+            align="center"
+            payload={[
+              { value: 'Images', type: 'circle', color: COLORS[0] },
+              { value: 'Videos', type: 'circle', color: COLORS[1] },
+            ]}
+          />
         </RechartsPieChart>
       </ResponsiveContainer>
       </ChartContainer>
