@@ -1,10 +1,14 @@
 import io
 from dotenv import load_dotenv
-from google.cloud import videointelligence
+from collections import Counter
 from google.cloud import storage
 from google.cloud import vision
 from google.cloud import language_v1
 import os
+from datetime import timedelta
+from typing import Optional, Sequence, cast
+
+from google.cloud import videointelligence_v1 as vi
 load_dotenv()
 
 '''Initializations'''
@@ -36,36 +40,36 @@ def upload_blob(source_file_name, destination_blob_name, bucket_name=bucket_name
     )
     return f'gs://{bucket_name}/{destination_blob_name}'
 
-def analyze_video(link_to_video):
-    video_client = videointelligence.VideoIntelligenceServiceClient()
-    features = [videointelligence.Feature.EXPLICIT_CONTENT_DETECTION]
-    operation = video_client.annotate_video(
-    request={"features": features, "input_uri": link_to_video}
+def analyze_video(
+    video_uri: str,
+    segments: Optional[Sequence[vi.VideoSegment]] = None,
+) -> vi.VideoAnnotationResults:
+    video_client = vi.VideoIntelligenceServiceClient()
+    features = [vi.Feature.EXPLICIT_CONTENT_DETECTION]
+    context = vi.VideoContext(segments=segments)
+    request = vi.AnnotateVideoRequest(
+        input_uri=video_uri,
+        features=features,
+        video_context=context,
     )
 
-    print("\nProcessing video for explicit content annotations:")
-    result = operation.result(timeout=90)
-    print("\nFinished processing.")
-    # Retrieve first result because a single video was processed
-    total_score = 0
+    print(f'Processing video "{video_uri}"...')
+    operation = video_client.annotate_video(request)
 
-    segment = result.annotation_results[0].segment
-    start_time = segment.start_time_offset.seconds + segment.start_time_offset.microseconds / 1e6
-    end_time = segment.end_time_offset.seconds + segment.end_time_offset.microseconds / 1e6
-    video_duration = end_time - start_time
+    # Wait for operation to complete
+    response = cast(vi.AnnotateVideoResponse, operation.result())
+    # A single video is processed
+    results = response.annotation_results[0]
 
-    for frame in result.annotation_results[0].explicit_annotation.frames:
-        likelihood = videointelligence.Likelihood(frame.pornography_likelihood)
-        frame_time = frame.time_offset.seconds + frame.time_offset.microseconds / 1e6
-        frame_score = likelihood_name[likelihood.name]
-        time_weight = 1 - abs((frame_time - (video_duration / 2)) / (video_duration / 2))
-        total_score += frame_score * time_weight
+    frames = results.explicit_annotation.frames
+    likelihood_counts = Counter([f.pornography_likelihood for f in frames])
 
-    max_possible_score = len(result.annotation_results[0].explicit_annotation.frames) * 5 if len(result.annotation_results[0].explicit_annotation.frames) > 0 else 1
-    safety_score = (total_score / max_possible_score) * 100
-
-    return safety_score #0-25: safe | 25-50: moderate | 50-75: unsafe | 75-100: explicit
-
+    print(f" Explicit content frames: {len(frames)} ".center(40, "-"))
+    
+    result = {}
+    for likelihood in vi.Likelihood:
+        result[likelihood.name] = likelihood_counts[likelihood]
+    return result
 
 def analyze_image(link_to_image):
     """Detects unsafe features in the file."""

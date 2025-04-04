@@ -140,7 +140,35 @@ def get_file_type(file_link):
     else:
         return "Unknown"
 
-
+def media_count():
+    connection = create_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("""
+                SELECT file_link
+                FROM social_media_posts
+            """)
+            
+            records = cursor.fetchall()
+            image_count = 0
+            video_count = 0
+            for row in records:
+                file_type = get_file_type(row[0])
+                if file_type == "Image":
+                    image_count += 1
+                elif file_type == "Video":
+                    video_count += 1
+            return {
+                "image_count": image_count,
+                "video_count": video_count
+            }
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+            return []
+        finally:
+            cursor.close()
+            connection.close()
 #code to fetch all data from database
 def retrieve_data():
     connection = create_connection()

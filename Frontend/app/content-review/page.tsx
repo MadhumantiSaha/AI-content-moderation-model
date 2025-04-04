@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Filter, ImageIcon, MessageSquare, MoreHorizontal, Search, ThumbsDown, ThumbsUp, Video } from "lucide-react"
+import { ArrowUpDown, Filter, FilterIcon, ImageIcon, MessageSquare, MoreHorizontal, Search, SortAscIcon, ThumbsDown, ThumbsUp, Video } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
@@ -18,6 +18,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import DashboardLayout from "@/components/dashboard-layout"
+import { useContentData } from "@/hooks/useContentData"
+
 
 // Sample data for content items
 const contentItems = [
@@ -74,29 +76,45 @@ const contentItems = [
   },
 ]
 
+
 export default function ContentReviewPage() {
   const [activeTab, setActiveTab] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [priorityFilter, setPriorityFilter] = useState("all")
-
+  const [sortOrder, setSortOrder] = useState("all");
+  const { data, loading, error } = useContentData();
+  console.log('Data:', data);
+  console.log('Loading:', loading);
+  console.log('Error:', error);
   // Filter content based on active tab, search query, and priority filter
-  const filteredContent = contentItems.filter((item) => {
+  const filteredContent = (data || []).filter((item) => {
     // Filter by content type
-    if (activeTab !== "all" && item.type !== activeTab) return false
+    if (activeTab !== "all" && item.file_type !== activeTab) return false
 
     // Filter by search query
     if (
       searchQuery &&
-      !item.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      // !item.title.toLowerCase().includes(searchQuery.toLowerCase()) &&   <Future development>
       !item.username.toLowerCase().includes(searchQuery.toLowerCase())
     )
       return false
 
     // Filter by priority
-    if (priorityFilter !== "all" && item.priority !== priorityFilter) return false
+    // if (priorityFilter !== "all" && item.priority !== priorityFilter) return false  <Future development>
 
     return true
   })
+
+
+let sortedContent = [...filteredContent];
+
+// Sorting logic
+if (sortOrder === "newest") {
+  sortedContent.sort((a, b) => new Date(b.date_and_time).getTime() - new Date(a.date_and_time).getTime());
+} else if (sortOrder === "oldest") {
+  sortedContent.sort((a, b) => new Date(a.date_and_time).getTime() - new Date(b.date_and_time).getTime());
+} 
+
 
   const handleApprove = (id: number) => {
     console.log(`Approved content with ID: ${id}`)
@@ -121,9 +139,9 @@ export default function ContentReviewPage() {
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
               <TabsList>
                 <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="image">Images</TabsTrigger>
-                <TabsTrigger value="video">Videos</TabsTrigger>
-                <TabsTrigger value="comment">Comments</TabsTrigger>
+                <TabsTrigger value="Image">Images</TabsTrigger>
+                <TabsTrigger value="Video">Videos</TabsTrigger>
+                <TabsTrigger value="Comment">Comments</TabsTrigger>
               </TabsList>
             </Tabs>
 
@@ -139,43 +157,43 @@ export default function ContentReviewPage() {
                 />
               </div>
 
-              <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+              <Select value={sortOrder} onValueChange={setSortOrder}>
                 <SelectTrigger className="w-full sm:w-40">
                   <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4" />
+                    <ArrowUpDown className="h-4 w-4" />
                     <SelectValue placeholder="Filter by priority" />
                   </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Priorities</SelectItem>
-                  <SelectItem value="high">High Priority</SelectItem>
-                  <SelectItem value="medium">Medium Priority</SelectItem>
-                  <SelectItem value="low">Low Priority</SelectItem>
+                  <SelectItem value="all">Sort By</SelectItem>
+                  <SelectItem value="newest">Newest to oldest</SelectItem>
+                  <SelectItem value="oldest">Oldest to newest</SelectItem>
+                  {/* <SelectItem value="low">Low Priority</SelectItem> */}
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="space-y-4">
-            {filteredContent.length === 0 ? (
+            {sortedContent.length === 0 ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-10">
                   <p className="text-muted-foreground text-center">No content items match your filters</p>
                 </CardContent>
               </Card>
             ) : (
-              filteredContent.map((item) => (
-                <Card key={item.id}>
+              sortedContent.map((item,index) => (
+                <Card key={index}>
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        {item.type === "image" && <ImageIcon className="h-4 w-4" />}
-                        {item.type === "video" && <Video className="h-4 w-4" />}
-                        {item.type === "comment" && <MessageSquare className="h-4 w-4" />}
-                        <CardTitle className="text-lg">{item.title}</CardTitle>
-                        {item.priority === "high" && <Badge variant="destructive">High Priority</Badge>}
+                        {item.file_type === "image" && <ImageIcon className="h-4 w-4" />}
+                        {item.file_type === "video" && <Video className="h-4 w-4" />}
+                        {item.file_type === "comment" && <MessageSquare className="h-4 w-4" />}
+                        <CardTitle className="text-lg">{item.file_type}</CardTitle>
+                        {/* {item.priority === "high" && <Badge variant="destructive">High Priority</Badge>}
                         {item.priority === "medium" && <Badge>Medium Priority</Badge>}
-                        {item.priority === "low" && <Badge variant="outline">Low Priority</Badge>}
+                        {item.priority === "low" && <Badge variant="outline">Low Priority</Badge>} */}
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -201,7 +219,7 @@ export default function ContentReviewPage() {
                         </Avatar>
                         <span>{item.username}</span>
                         <span>•</span>
-                        <span>{item.timestamp}</span>
+                        <span>{item.date_and_time.split(' ')[0]}</span>
                       </div>
                     </CardDescription>
                   </CardHeader>
@@ -211,14 +229,15 @@ export default function ContentReviewPage() {
                         <span className="font-medium">Reason for review:</span> {item.reason}
                       </div>
 
-                      {(item.type === "image" || item.type === "video") && (
+                      {(item.file_type === "Image" || item.file_type === "Video") && (
                         <div className="relative aspect-video w-full max-w-md mx-auto overflow-hidden rounded-md border bg-muted">
                           <img
-                            src={item.thumbnail || "/placeholder.svg"}
-                            alt={item.title}
+                            //src={item.thumbnail || "/placeholder.svg"}
+                            src={"/placeholder.svg"}     
+                            alt={item.username}
                             className="h-full w-full object-cover"
                           />
-                          {item.type === "video" && (
+                          {item.file_type === "Video" && (
                             <div className="absolute inset-0 flex items-center justify-center">
                               <div className="rounded-full bg-background/80 p-3">
                                 <Video className="h-6 w-6" />
@@ -228,20 +247,20 @@ export default function ContentReviewPage() {
                         </div>
                       )}
 
-                      {item.type === "comment" && <div className="rounded-md border p-3 text-sm">{item.content}</div>}
+                      {item.file_type === "comment" && <div className="rounded-md border p-3 text-sm">{item.caption}</div>}
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-end gap-2">
                     <Button
                       variant="outline"
-                      onClick={() => handleReject(item.id)}
+                      onClick={() => handleReject(index)} // paste item.id instead of index
                       className="text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
                       <ThumbsDown className="mr-2 h-4 w-4" />
                       Reject
                     </Button>
                     <Button
-                      onClick={() => handleApprove(item.id)}
+                      onClick={() => handleApprove(index)}  // paste item.id instead of index
                       className="bg-green-600 hover:bg-green-700 text-white"
                     >
                       <ThumbsUp className="mr-2 h-4 w-4" />
