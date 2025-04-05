@@ -5,11 +5,13 @@ A full-stack application that provides automated content moderation using AI to 
 ## Overview
 
 This project consists of three main components:
+
 1. Content Moderation Dashboard (Frontend)
 2. Moderation Backend Service
 3. Demo Social Media App (PixelPost)
 
 ### PixelPost - Demo Social Media App
+
 - Users can create accounts and post content (images/videos)
 - Add captions and hashtags to posts
 - Real-time content moderation before posts go live
@@ -19,13 +21,16 @@ This project consists of three main components:
 ## Features
 
 ### Multi-Modal Content Analysis
+
 Supports moderation of:
+
 - Images - Detect inappropriate visual content
 - Videos - Frame-by-frame analysis
 - Text/Captions - Toxicity detection
 - Hashtags - Blacklist filtering
 
 ### AI-Powered Detection
+
 - Explicit content detection
 - Violence and graphic content detection
 - Hate speech and toxicity analysis
@@ -33,12 +38,14 @@ Supports moderation of:
 - Real-time moderation decisions
 
 ### Policy Management
+
 - Configurable moderation thresholds
 - Custom rule creation
 - Automated flagging settings
 - Content filtering policies
 
 ### Moderation Dashboard
+
 - Content review interface
 - Moderation history tracking
 - Analytics and reporting
@@ -48,6 +55,7 @@ Supports moderation of:
 ## Tech Stack
 
 ### Frontend (Dashboard & PixelPost)
+
 - Next.js 15
 - TypeScript
 - Tailwind CSS
@@ -56,13 +64,14 @@ Supports moderation of:
 - Real-time updates
 
 ### Backend
+
 - Python
 - FastAPI
 - Google Cloud AI services
   - Vision AI
   - Video Intelligence API
   - Natural Language API
-- MySql Database
+- GCP CloudMySql Database
 
 ## Getting Started
 
@@ -101,12 +110,14 @@ GOOGLE_APPLICATION_CREDENTIALS=path/to/service_account.json
 ## API Endpoints
 
 ### Content Moderation
+
 - `POST /check_content` - Submit content for moderation
 - `GET /moderation-history` - Retrieve moderation history
 - `GET /analytics` - Get moderation analytics
 - `POST /policy` - Update moderation policies
 
 ### Demo App
+
 - `POST /posts` - Create new post
 - `GET /posts` - Get approved posts
 - `POST /register` - User registration
@@ -117,8 +128,10 @@ GOOGLE_APPLICATION_CREDENTIALS=path/to/service_account.json
 ```
 ├── Frontend/           # Next.js moderation dashboard
 ├── Backend/           # Python Flask backend
-│   ├── app.py        # Main application file
-│   └── cloud_operations.py  # Cloud AI operations
+│   ├── app.py               # Main application file
+│   ├── cloud_operations.py  # Cloud AI operations
+|   ├── Dockerfile           # Containerization
+|   └──requirement.txt       # Requirements
 └── Demo app/          # PixelPost social media app
     └── pixel-posts/   # React-based demo frontend
 ```
