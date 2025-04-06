@@ -14,7 +14,7 @@ from Database_essentials import db_Calculations
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:8080"],  # Update to match your frontend port
+    allow_origins=["http://localhost:3000", "http://localhost:8080", "https://ai-content-moderation-model.vercel.app"],# Update to match your frontend port
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
