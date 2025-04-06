@@ -1,41 +1,38 @@
-"use client";
-
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { API_URL } from '@/lib/api-config';
-
-
-interface ContentItem {
-  id: number;
-  file_type: 'Image' | 'Video' | 'Comment';
-  username: string;
-  date_and_time: string;
-  reason: string;
-  caption?: string;
-}
+interface ContentData {
+    username: string
+    file_type: string
+    date_and_time: string
+    caption: string
+    hashtags: string
+    status: string
+    reason: string
+  }
 
 export function useContentData() {
-  const [data, setData] = useState<ContentItem[]>([]);
+  const [data, setData] = useState<ContentData[]>([]);//useState<ContentData[] | null>(null)
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_URL}/moderation-history`);
-        if (!response.ok) throw new Error('Failed to fetch data');
+        const response = await fetch(`${API_URL}/moderation-history`,{method:'GET'}); 
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+        }
         const result = await response.json();
-        setData(Array.isArray(result) ? result : []);
+        console.log('API Response:', result);
+        setData(result.retrived_data); // Store the retrieved data
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch data'));
+        setError(err instanceof Error ? err.message : 'An error occurred')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-
+    }
     fetchData();
   }, []);
-
-  return { data, loading, error };
-  
+  return { data, loading, error }
 }
-

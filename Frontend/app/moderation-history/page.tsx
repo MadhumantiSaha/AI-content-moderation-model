@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react";
 import DashboardLayout from '@/components/dashboard-layout';
+import { API_URL } from '@/lib/api-config';
 
 interface ModerationItem {
   username: string;
@@ -25,7 +26,7 @@ export function useModerationHistory() {
     const fetchData = async () => {
       try {
         console.log('Fetching moderation history...');
-        const response = await fetch('http://localhost:8000/moderation-history');
+        const response = await fetch(`${API_URL}/moderation-history`,{method: 'GET'});
         if (!response.ok) {
           console.error('Error fetching moderation history:');
           throw new Error(`HTTP error! status: ${response.status}`);
