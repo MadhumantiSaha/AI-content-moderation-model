@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { API_URL } from '@/lib/api-config';
 
 interface ModerationItem {
   username: string
@@ -17,12 +18,9 @@ export function useModerationHistory() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/moderation-history', {
+        const response = await fetch(`${API_URL}/moderation-history`, {
           method: 'GET',
-      })
-        // if (!response.ok) {
-        //   throw new Error(`HTTP error! status: ${response.status}`)
-        // }
+        })
         console.log(response)
         const result = await response.json()
         console.log(result)

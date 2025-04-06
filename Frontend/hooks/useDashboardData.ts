@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { API_URL } from '@/lib/api-config';
 
 interface DashboardData {
   content_reviewed: number
@@ -17,7 +18,9 @@ export function useDashboardData() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/dashboard',{method:'GET'})
+        const response = await fetch(`${API_URL}/dashboard`, {
+          method: 'GET'
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
