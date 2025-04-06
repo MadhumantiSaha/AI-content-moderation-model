@@ -20,58 +20,101 @@ import {
 import DashboardLayout from "@/components/dashboard-layout"
 import { useContentData } from "@/hooks/useContentData"
 
-interface ContentItem {
-  id: number;
-  file_type: 'Image' | 'Video' | 'Comment';
-  username: string;
-  date_and_time: string;
-  reason: string;
-  caption?: string;
-}
+
+// Sample data for content items
+const contentItems = [
+  {
+    id: 1,
+    type: "image",
+    title: "Profile picture upload",
+    username: "user123",
+    timestamp: "2 hours ago",
+    priority: "high",
+    reason: "Potentially inappropriate content",
+    thumbnail: "/placeholder.svg?height=200&width=300",
+  },
+  {
+    id: 2,
+    type: "video",
+    title: "Product demonstration video",
+    username: "vendor456",
+    timestamp: "3 hours ago",
+    priority: "medium",
+    reason: "Reported by multiple users",
+    thumbnail: "/placeholder.svg?height=200&width=300",
+  },
+  {
+    id: 3,
+    type: "comment",
+    title: "Comment on blog post",
+    username: "commenter789",
+    timestamp: "5 hours ago",
+    priority: "low",
+    reason: "Contains flagged keywords",
+    content:
+      "This product is absolutely terrible! I can't believe anyone would buy this garbage. The company should be ashamed!",
+  },
+  {
+    id: 4,
+    type: "image",
+    title: "Event photo upload",
+    username: "eventorg101",
+    timestamp: "6 hours ago",
+    priority: "medium",
+    reason: "User reported content",
+    thumbnail: "/placeholder.svg?height=200&width=300",
+  },
+  {
+    id: 5,
+    type: "comment",
+    title: "Product review comment",
+    username: "reviewer202",
+    timestamp: "8 hours ago",
+    priority: "low",
+    reason: "Automated flag - suspicious links",
+    content: "Check out this amazing deal I found! Click here: [suspicious link removed]",
+  },
+]
+
 
 export default function ContentReviewPage() {
-  const [activeTab, setActiveTab] = useState<string>("all");
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [priorityFilter, setPriorityFilter] = useState<string>("all");
-  const [sortOrder, setSortOrder] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState("all")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [priorityFilter, setPriorityFilter] = useState("all")
+  const [sortOrder, setSortOrder] = useState("all");
   const { data, loading, error } = useContentData();
-  console.log("PRINTING CONTENT DATA")
-  console.log(data)
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error loading content</div>;
-  }
-
-  if (!data) {
-    return <div>No content available</div>;
-  }
-
+  console.log('Data:', data);
+  console.log('Loading:', loading);
+  console.log('Error:', error);
   // Filter content based on active tab, search query, and priority filter
-  const filteredContent = (data || []).filter((item: ContentItem) => {
+  const filteredContent = (data || []).filter((item) => {
     // Filter by content type
     if (activeTab !== "all" && item.file_type !== activeTab) return false
 
     // Filter by search query
     if (
       searchQuery &&
+      // !item.title.toLowerCase().includes(searchQuery.toLowerCase()) &&   <Future development>
       !item.username.toLowerCase().includes(searchQuery.toLowerCase())
     )
       return false
 
+    // Filter by priority
+    // if (priorityFilter !== "all" && item.priority !== priorityFilter) return false  <Future development>
+
     return true
   })
 
-  let sortedContent = [...filteredContent];
 
-  // Sorting logic
-  if (sortOrder === "newest") {
-    sortedContent.sort((a, b) => new Date(b.date_and_time).getTime() - new Date(a.date_and_time).getTime());
-  } else if (sortOrder === "oldest") {
-    sortedContent.sort((a, b) => new Date(a.date_and_time).getTime() - new Date(b.date_and_time).getTime());
-  } 
+let sortedContent = [...filteredContent];
+
+// Sorting logic
+if (sortOrder === "newest") {
+  sortedContent.sort((a, b) => new Date(b.date_and_time).getTime() - new Date(a.date_and_time).getTime());
+} else if (sortOrder === "oldest") {
+  sortedContent.sort((a, b) => new Date(a.date_and_time).getTime() - new Date(b.date_and_time).getTime());
+} 
+
 
   const handleApprove = (id: number) => {
     console.log(`Approved content with ID: ${id}`)
@@ -125,6 +168,7 @@ export default function ContentReviewPage() {
                   <SelectItem value="all">Sort By</SelectItem>
                   <SelectItem value="newest">Newest to oldest</SelectItem>
                   <SelectItem value="oldest">Oldest to newest</SelectItem>
+                  {/* <SelectItem value="low">Low Priority</SelectItem> */}
                 </SelectContent>
               </Select>
             </div>
@@ -143,10 +187,13 @@ export default function ContentReviewPage() {
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        {item.file_type === "Image" && <ImageIcon className="h-4 w-4" />}
-                        {item.file_type === "Video" && <Video className="h-4 w-4" />}
-                        {item.file_type === "Comment" && <MessageSquare className="h-4 w-4" />}
+                        {item.file_type === "image" && <ImageIcon className="h-4 w-4" />}
+                        {item.file_type === "video" && <Video className="h-4 w-4" />}
+                        {item.file_type === "comment" && <MessageSquare className="h-4 w-4" />}
                         <CardTitle className="text-lg">{item.file_type}</CardTitle>
+                        {/* {item.priority === "high" && <Badge variant="destructive">High Priority</Badge>}
+                        {item.priority === "medium" && <Badge>Medium Priority</Badge>}
+                        {item.priority === "low" && <Badge variant="outline">Low Priority</Badge>} */}
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -185,6 +232,7 @@ export default function ContentReviewPage() {
                       {(item.file_type === "Image" || item.file_type === "Video") && (
                         <div className="relative aspect-video w-full max-w-md mx-auto overflow-hidden rounded-md border bg-muted">
                           <img
+                            //src={item.thumbnail || "/placeholder.svg"}
                             src={"/placeholder.svg"}     
                             alt={item.username}
                             className="h-full w-full object-cover"
@@ -199,20 +247,20 @@ export default function ContentReviewPage() {
                         </div>
                       )}
 
-                      {item.file_type === "Comment" && <div className="rounded-md border p-3 text-sm">{item.caption}</div>}
+                      {item.file_type === "comment" && <div className="rounded-md border p-3 text-sm">{item.caption}</div>}
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-end gap-2">
                     <Button
                       variant="outline"
-                      onClick={() => handleReject(index)}
+                      onClick={() => handleReject(index)} // paste item.id instead of index
                       className="text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
                       <ThumbsDown className="mr-2 h-4 w-4" />
                       Reject
                     </Button>
                     <Button
-                      onClick={() => handleApprove(index)}
+                      onClick={() => handleApprove(index)}  // paste item.id instead of index
                       className="bg-green-600 hover:bg-green-700 text-white"
                     >
                       <ThumbsUp className="mr-2 h-4 w-4" />
@@ -228,3 +276,4 @@ export default function ContentReviewPage() {
     </DashboardLayout>
   )
 }
+
