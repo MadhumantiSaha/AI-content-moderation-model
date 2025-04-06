@@ -21,7 +21,9 @@ export function useContentData() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_URL}/moderation-history`);
+        const response = await fetch(`${API_URL}/moderation-history`, {
+          method: 'GET',
+        });
         if (!response.ok) throw new Error('Failed to fetch data');
         const result = await response.json();
         setData(Array.isArray(result) ? result : []);
