@@ -19,7 +19,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import DashboardLayout from "@/components/dashboard-layout"
 import { useContentData } from "@/hooks/useContentData"
-
+console.log("PRINTING CONTENT DATA")
+console.log(data)
 interface ContentItem {
   id: number;
   file_type: 'Image' | 'Video' | 'Comment';
