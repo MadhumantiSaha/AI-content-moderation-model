@@ -19,8 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import DashboardLayout from "@/components/dashboard-layout"
 import { useContentData } from "@/hooks/useContentData"
-console.log("PRINTING CONTENT DATA")
-console.log(data)
+
 interface ContentItem {
   id: number;
   file_type: 'Image' | 'Video' | 'Comment';
@@ -36,7 +35,8 @@ export default function ContentReviewPage() {
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<string>("all");
   const { data, loading, error } = useContentData();
-
+  console.log("PRINTING CONTENT DATA")
+  console.log(data)
   if (loading) {
     return <div>Loading...</div>;
   }
