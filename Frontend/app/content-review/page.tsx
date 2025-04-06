@@ -187,9 +187,9 @@ if (sortOrder === "newest") {
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        {item.file_type === "image" && <ImageIcon className="h-4 w-4" />}
-                        {item.file_type === "video" && <Video className="h-4 w-4" />}
-                        {item.file_type === "comment" && <MessageSquare className="h-4 w-4" />}
+                        {item.file_type === "Image" && <ImageIcon className="h-4 w-4" />}
+                        {item.file_type === "Video" && <Video className="h-4 w-4" />}
+                        {item.file_type === "Comment" && <MessageSquare className="h-4 w-4" />}
                         <CardTitle className="text-lg">{item.file_type}</CardTitle>
                         {/* {item.priority === "high" && <Badge variant="destructive">High Priority</Badge>}
                         {item.priority === "medium" && <Badge>Medium Priority</Badge>}
